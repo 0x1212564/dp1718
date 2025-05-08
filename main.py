@@ -18,6 +18,7 @@ STATE_JUNCTION = "JUNCTION"
 STATE_LOST = "LOST"
 STATE_FINISHED = "FINISHED"
 
+
 class SensorManager:
     """Manages the robot's sensors and provides readings"""
     
@@ -164,7 +165,6 @@ class JunctionHandler:
         self.junction_cooldown_start = 0
         self.JUNCTION_COOLDOWN_TIME = 2.0
         self.handled_current_junction = False
-        self.current_turn_speeds = (0.0, 0.0)
         
     def handle_junction(self, motor_controller):
         """Handle behavior at junctions"""
@@ -223,6 +223,7 @@ class RecoveryHandler:
                 logging.info(f"Lost line - recovering left (factor: {recovery_factor:.2f})")
                 return (0.0, max(0.4, BASE_SPEED * RECOVERY_SPEED * recovery_factor))
             elif weighted_sum > 0:
+                
                 logging.info(f"Lost line - recovering right (factor: {recovery_factor:.2f})")
                 return (max(0.4, BASE_SPEED * RECOVERY_SPEED * recovery_factor), 0.0)
         
