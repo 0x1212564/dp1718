@@ -66,13 +66,13 @@ class SensorManager:
         except Exception as e:
             logging.error(f"Sensor reading error: {e}")
             return self.prev_readings.copy()
-            
-    def detect_junction(self, sensors):
+    @staticmethod
+    def detect_junction(sensors):
         """Detect if robot is at a junction"""
         black_count = sum(1 for s in sensors if s == 0)
         return black_count >= MIN_BLACK_SENSORS_JUNCTION
-        
-    def detect_line_lost(self, sensors):
+    @staticmethod
+    def detect_line_lost(sensors):
         """Detect if line is lost (all sensors see white)"""
         return all(s == 1 for s in sensors)
 
@@ -108,7 +108,8 @@ class MotorController:
             try:
                 self.motor_left.write(0)
                 self.motor_right.write(0)
-            except:
+            except Exception as e:
+                logging.error(f"Motor control error: {e}")
                 pass
                 
     def stop(self):
@@ -166,7 +167,7 @@ class JunctionHandler:
         self.JUNCTION_COOLDOWN_TIME = 2.0
         self.handled_current_junction = False
         
-    def handle_junction(self, motor_controller):
+    def handle_junction(self):
         """Handle behavior at junctions"""
         if self.junction_count < len(ROUTE_PLAN):
             direction = ROUTE_PLAN[self.junction_count]
@@ -221,14 +222,14 @@ class RecoveryHandler:
             
             if weighted_sum < 0:
                 logging.info(f"Lost line - recovering left (factor: {recovery_factor:.2f})")
-                return (0.0, max(0.4, BASE_SPEED * RECOVERY_SPEED * recovery_factor))
+                return 0.0, max(0.4, BASE_SPEED * RECOVERY_SPEED * recovery_factor)
             elif weighted_sum > 0:
                 
                 logging.info(f"Lost line - recovering right (factor: {recovery_factor:.2f})")
-                return (max(0.4, BASE_SPEED * RECOVERY_SPEED * recovery_factor), 0.0)
+                return max(0.4, BASE_SPEED * RECOVERY_SPEED * recovery_factor), 0.0
         
         logging.info(f"Lost line - searching in place (factor: {recovery_factor:.2f})")
-        return (max(0.4, BASE_SPEED * RECOVERY_SPEED * recovery_factor), 0.0)
+        return max(0.4, BASE_SPEED * RECOVERY_SPEED * recovery_factor), 0.0
 
 
 class StateManager:
@@ -333,6 +334,7 @@ class LineFollower:
                 logging.info(f"{state_str} [{sensors_str}] State: {current_state}")
                 
                 # Handle different states
+                left_speed, right_speed = 0,0
                 if current_state == STATE_LINE_FOLLOWING:
                     left_speed, right_speed = self.pid_controller.calculate(sensor_readings)
                 elif current_state == STATE_JUNCTION:
@@ -356,17 +358,22 @@ class LineFollower:
             logging.error(f"Unexpected error: {e}")
         finally:
             self.cleanup()
-            
+
     def cleanup(self):
-        """Clean up resources when program exits"""
+        """Clean up resources when program exits."""
         logging.info("Cleaning up resources...")
-        if self.motor_controller:
-            self.motor_controller.stop()
+
+        try:
+            if self.motor_controller:
+                self.motor_controller.stop()
+        except Exception as e:
+            logging.error(f"Error stopping motor controller: {e}")
+
         try:
             if self.board:
                 self.board.exit()
-        except:
-            pass
+        except Exception as e:
+            logging.error(f"Error exiting board: {e}")
 
 
 # Main entry point
