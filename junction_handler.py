@@ -21,7 +21,7 @@ class JunctionHandler:
         self.junction_count = 0
         logging.info(f"New route set: {self.current_route}")
         
-    def handle_junction(self, motor_controller=None):
+    def handle_junction(self):
         """Handle behavior at junctions"""
         if self.junction_count < len(self.current_route):
             direction = self.current_route[self.junction_count]

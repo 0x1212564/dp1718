@@ -16,7 +16,7 @@ class StateManager:
         self.previous_state = STATE_LINE_FOLLOWING
         self.state_change_time = time.time()
         
-    def update_state(self, sensor_readings, sensor_manager, junction_handler, recovery_handler):
+    def update_state(self, sensor_readings, sensor_manager, junction_handler):
         """Update the robot's state based on sensor readings"""
         self.previous_state = self.current_state
         

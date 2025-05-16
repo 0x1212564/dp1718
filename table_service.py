@@ -1,8 +1,9 @@
 """Table service functionality for the robot"""
 import logging
-import time
+
 from config import KITCHEN_START_POINT, TABLES_TO_VISIT
 from database_handler import DatabaseHandler
+
 
 class TableService:
     """Manages table service functionality"""

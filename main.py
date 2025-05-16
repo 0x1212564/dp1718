@@ -3,7 +3,7 @@ Line follower robot with table service functionality
 Main entry point for the application
 """
 import logging
-import time
+
 from line_follower import LineFollower
 
 # Configure logging
