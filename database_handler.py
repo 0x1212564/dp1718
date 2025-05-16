@@ -38,13 +38,13 @@ class DatabaseHandler:
             self.connection.close()
             logging.info("Database connection closed")
             
-    def get_route_plan(self, start_point, table_number):
+    def get_waypoints(self, from_table_id, to_table_id):
         """
-        Retrieve route plan from database for given start point and table number
+        Retrieve waypoints instructions from database for navigation between tables
         
         Args:
-            start_point (str): Starting point ID
-            table_number (str): Destination table number
+            from_table_id (str): Starting table ID
+            to_table_id (str): Destination table ID
             
         Returns:
             list: List of directions (e.g., ["LEFT", "STRAIGHT", "RIGHT"])
@@ -57,11 +57,11 @@ class DatabaseHandler:
         try:
             cursor = self.connection.cursor()
             query = """
-                SELECT 
-                FROM routes 
-                WHERE start_point = %s AND destination = %s
+                SELECT instructies 
+                FROM waypoints 
+                WHERE van_tafel_id = %s AND naar_tafel_id = %s
             """
-            cursor.execute(query, (start_point, table_number))
+            cursor.execute(query, (from_table_id, to_table_id))
             result = cursor.fetchone()
             cursor.close()
             
@@ -80,14 +80,14 @@ class DatabaseHandler:
                     elif step in ["vooruit", "rechtdoor"]:
                         route_steps.append("STRAIGHT")
                 
-                logging.info(f"Retrieved route plan for table {table_number}: {route_steps}")
+                logging.info(f"Retrieved waypoints from table {from_table_id} to table {to_table_id}: {route_steps}")
                 return route_steps
             else:
-                logging.warning(f"No route found for start point {start_point} to table {table_number}")
+                logging.warning(f"No waypoints found from table {from_table_id} to table {to_table_id}")
                 return None
                 
         except Error as e:
-            logging.error(f"Error retrieving route plan: {e}")
+            logging.error(f"Error retrieving waypoints: {e}")
             return None
             
     def get_all_tables(self):
@@ -105,9 +105,9 @@ class DatabaseHandler:
         try:
             cursor = self.connection.cursor()
             query = """
-                SELECT DISTINCT destination 
-                FROM routes 
-                ORDER BY destination
+                SELECT DISTINCT naar_tafel_id 
+                FROM waypoints 
+                ORDER BY naar_tafel_id
             """
             cursor.execute(query)
             results = cursor.fetchall()
