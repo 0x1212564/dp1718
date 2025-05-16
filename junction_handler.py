@@ -1,7 +1,7 @@
 """Junction detection and handling for the line follower robot"""
 import logging
 import time
-from config import BASE_SPEED, JUNCTION_TURN_FACTOR, JUNCTION_COOLDOWN_TIME, ROUTE_PLAN
+from config import BASE_SPEED, JUNCTION_TURN_FACTOR, JUNCTION_COOLDOWN_TIME
 
 class JunctionHandler:
     """Handles junction detection and navigation"""
