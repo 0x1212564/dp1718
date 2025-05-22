@@ -22,7 +22,8 @@ class DatabaseHandler:
                 host=self.host,
                 user=self.user,
                 password=self.password,
-                database=self.database
+                database=self.database,
+                auth_plugin='mysql_native_password'
             )
             if self.connection.is_connected():
                 logging.info(f"Connected to MySQL database: {self.database}")
@@ -58,7 +59,7 @@ class DatabaseHandler:
             cursor = self.connection.cursor()
             query = """
                 SELECT instructies 
-                FROM waypoints 
+                FROM waypoint
                 WHERE van_tafel_id = %s AND naar_tafel_id = %s
             """
             cursor.execute(query, (from_table_id, to_table_id))
@@ -106,7 +107,7 @@ class DatabaseHandler:
             cursor = self.connection.cursor()
             query = """
                 SELECT DISTINCT naar_tafel_id 
-                FROM waypoints 
+                FROM waypoint
                 ORDER BY naar_tafel_id
             """
             cursor.execute(query)

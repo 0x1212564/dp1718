@@ -6,7 +6,7 @@ MOTOR_LEFT_PIN = "d:11:p"
 MOTOR_RIGHT_PIN = "d:3:p"
 
 # Speed and threshold settings
-BASE_SPEED = 0.1
+BASE_SPEED = 0.78
 SENSOR_THRESHOLD = 0.5
 RECOVERY_SPEED = 1.2
 

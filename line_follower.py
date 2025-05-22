@@ -9,7 +9,7 @@ from motors import MotorController
 from pid_controller import PIDController
 from junction_handler import JunctionHandler
 from recovery_handler import RecoveryHandler
-from state_manager import StateManager, STATE_LINE_FOLLOWING, STATE_JUNCTION, STATE_LOST, STATE_FINISHED
+from state_manager import StateManager, STATE_LINE_FOLLOWING, STATE_JUNCTION, STATE_LOST, STATE_FINISHED, STATE_CONTINUE_TURNING, STATE_CONTINUE_TO_WHITE
 from database_handler import DatabaseHandler
 from table_service import TableService
 
@@ -118,6 +118,9 @@ class LineFollower:
                             logging.info(f"Arrived at table {self.table_service.current_destination}. Pausing for {TABLE_PAUSE_TIME} seconds.")
                             time.sleep(TABLE_PAUSE_TIME)
                             
+                            # Set flag to continue after table
+                            self.state_manager.set_continue_after_table(True)
+                            
                             # Get route to next table
                             next_route = self.table_service.get_route_to_next_table()
                             if next_route:
@@ -138,6 +141,12 @@ class LineFollower:
                     left_speed, right_speed = self.recovery_handler.handle_lost_line(
                         self.sensor_manager.last_valid_pattern
                     )
+                elif current_state == STATE_CONTINUE_TURNING:
+                    # Continue turning in the last direction
+                    left_speed, right_speed = self.state_manager.get_last_turn_direction()
+                elif current_state == STATE_CONTINUE_TO_WHITE:
+                    # Continue line following until all white
+                    left_speed, right_speed = self.pid_controller.calculate(sensor_readings)
                 elif current_state == STATE_FINISHED:
                     left_speed, right_speed = 0, 0
                 
