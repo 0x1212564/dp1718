@@ -16,7 +16,7 @@ class StateManager:
         self.previous_state = STATE_LINE_FOLLOWING
         self.state_change_time = time.time()
         
-    def update_state(self, sensor_readings, sensor_manager, junction_handler):
+    def update_state(self, sensor_readings, sensor_manager, junction_handler, recovery_handler=None):
         """Update the robot's state based on sensor readings"""
         self.previous_state = self.current_state
         
@@ -29,6 +29,8 @@ class StateManager:
         # Check for lost line
         elif sensor_manager.detect_line_lost(sensor_readings):
             self.current_state = STATE_LOST
+            if self.previous_state != STATE_LOST:
+                recovery_handler.start_recovery()
         # Default to line following
         else:
             self.current_state = STATE_LINE_FOLLOWING

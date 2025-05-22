@@ -6,7 +6,7 @@ MOTOR_LEFT_PIN = "d:11:p"
 MOTOR_RIGHT_PIN = "d:3:p"
 
 # Speed and threshold settings
-BASE_SPEED = 0.20
+BASE_SPEED = 0.1
 SENSOR_THRESHOLD = 0.5
 RECOVERY_SPEED = 1.2
 
@@ -18,13 +18,13 @@ INTEGRAL_CAP = 5.0
 
 # Junction handling parameters
 JUNCTION_PAUSE_TIME = 0.1
-JUNCTION_TURN_FACTOR = 1.2
+JUNCTION_TURN_FACTOR = 1.4
 MIN_BLACK_SENSORS_JUNCTION = 3
 JUNCTION_COOLDOWN_TIME = 2.0  # Time to prevent repeated junction detection
-JUNCTION_DETECTION_THRESHOLD = 0.7  # Threshold for junction detection sensitivity
+
 
 # Default route plan (will be overridden by database route)
-ROUTE_PLAN = ["STRAIGHT", "RIGHT"]
+ROUTE_PLAN = ["RIGHT","LEFT"]
 
 # Main loop timing
 LOOP_DELAY = 0.05
