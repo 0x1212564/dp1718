@@ -1,7 +1,7 @@
 """Table service functionality for the robot"""
 import logging
 
-from config import KITCHEN_START_POINT, TABLES_TO_VISIT
+from config import KITCHEN_START_POINT, TABLES_TO_VISIT, TABLES_FILTER
 from database_handler import DatabaseHandler
 
 
@@ -18,10 +18,33 @@ class TableService:
     def load_tables(self):
         """Load tables to visit from database or use defaults"""
         db_tables = self.db_handler.get_all_tables()
+        
         if db_tables:
-            self.tables_to_visit = db_tables
+            # Apply filter if TABLES_FILTER is not empty
+            if TABLES_FILTER:
+                filtered_tables = [table for table in db_tables if table in TABLES_FILTER]
+                if filtered_tables:
+                    self.tables_to_visit = filtered_tables
+                    logging.info(f"Filtered tables to visit: {self.tables_to_visit} (from filter: {TABLES_FILTER})")
+                else:
+                    logging.warning(f"No tables match the filter {TABLES_FILTER}. Using all tables.")
+                    self.tables_to_visit = db_tables
+            else:
+                # No filter specified, use all tables
+                self.tables_to_visit = db_tables
         else:
-            self.tables_to_visit = TABLES_TO_VISIT
+            # Fallback to default tables
+            if TABLES_FILTER:
+                filtered_defaults = [table for table in TABLES_TO_VISIT if table in TABLES_FILTER]
+                if filtered_defaults:
+                    self.tables_to_visit = filtered_defaults
+                    logging.info(f"Using filtered default tables: {self.tables_to_visit}")
+                else:
+                    self.tables_to_visit = TABLES_TO_VISIT
+                    logging.warning(f"No default tables match the filter {TABLES_FILTER}. Using all default tables.")
+            else:
+                self.tables_to_visit = TABLES_TO_VISIT
+                
         logging.info(f"Tables to visit: {self.tables_to_visit}")
         
     def get_next_table(self):
